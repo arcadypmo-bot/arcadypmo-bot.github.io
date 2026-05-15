@@ -46,4 +46,58 @@ document.addEventListener('DOMContentLoaded', () => {
   const button = document.getElementById('time-btn');
   if (button) button.addEventListener('click', toggleTimePanel);
   document.addEventListener('click', closeTimePanel);
+
+  const overlay = document.getElementById('iframe-overlay');
+  const frame = document.getElementById('content-frame');
+  const frameTitle = document.getElementById('iframe-title');
+  const refreshBtn = document.getElementById('iframe-refresh');
+  const fullscreenBtn = document.getElementById('iframe-fullscreen');
+  const newTabBtn = document.getElementById('iframe-newtab');
+  const closeBtn = document.getElementById('iframe-close');
+
+  function closePreview() {
+    if (!overlay || !frame) return;
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden', 'true');
+    frame.src = '';
+  }
+
+  function openPreview(event) {
+    const link = event.currentTarget;
+    if (!overlay || !frame || !frameTitle) return;
+    event.preventDefault();
+    const href = link.href;
+    const title = link.dataset.title || link.textContent.trim();
+    frameTitle.textContent = title;
+    frame.src = href;
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+
+  document.querySelectorAll('.weapon-link').forEach(link => {
+    link.addEventListener('click', openPreview);
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', event => {
+    event.preventDefault();
+    closePreview();
+  });
+  if (overlay) overlay.addEventListener('click', event => {
+    if (event.target === overlay) closePreview();
+  });
+  if (refreshBtn) refreshBtn.addEventListener('click', event => {
+    event.preventDefault();
+    if (!frame || !frame.src) return;
+    frame.src = frame.src;
+  });
+  if (fullscreenBtn) fullscreenBtn.addEventListener('click', event => {
+    event.preventDefault();
+    if (!frame) return;
+    if (frame.requestFullscreen) frame.requestFullscreen();
+  });
+  if (newTabBtn) newTabBtn.addEventListener('click', event => {
+    event.preventDefault();
+    if (!frame || !frame.src) return;
+    window.open(frame.src, '_blank');
+  });
 });
